@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>四分割畫面播放視頻</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #000;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        #fileInputContainer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f0f0f0;
+            padding: 0px 0px;
+            height: 50px;
+        }
+
+        #fileInputContainer span {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            flex: 1;
+            height: 100%; /* Fill the entire height of the viewport */
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="fileInputContainer">
+        <span>Demo</span>
+        <input type="file" id="fileInput" accept=".json">
+    </div>
+    <div class="video-grid hidden">
+        <div class="video-container">
+            <video controls id="video1" loop autoplay muted>
+                您的瀏覽器不支援 HTML5 視頻標籤。
+            </video>
+        </div>
+        <div class="video-container">
+            <video controls id="video2" loop autoplay muted>
+                您的瀏覽器不支援 HTML5 視頻標籤。
+            </video>
+        </div>
+        <div class="video-container">
+            <video controls id="video3" loop autoplay muted>
+                您的瀏覽器不支援 HTML5 視頻標籤。
+            </video>
+        </div>
+        <div class="video-container">
+            <video controls id="video4" loop autoplay muted>
+                您的瀏覽器不支援 HTML5 視頻標籤。
+            </video>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        setUpVideoList('video1', data.videos1);
+                        setUpVideoList('video2', data.videos2);
+                        setUpVideoList('video3', data.videos3);
+                        setUpVideoList('video4', data.videos4);
+                        
+                        // Hide the file input container and show the video grid
+                        document.getElementById("fileInputContainer").style.height = "0px";
+                        document.getElementById("fileInputContainer").style.visibility = "hidden";
+
+                        //document.getElementById(".video-grid").style.height = "100%";
+                        // document.getElementById(".video-grid").style.visibility = "show";
+
+                        //document.getElementById('fileInputContainer').classList.add('hidden');
+                        //document.querySelector('fileInputContainer').classList.add('hidden');
+                        document.getElementById('fileInputContainer').classList.add('hidden');
+                        document.querySelector('.video-grid').classList.remove('hidden');
+                    } catch (error) {
+                        console.error('Error parsing JSON:', error);
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        function setUpVideoList(videoId, videoList) {
+            const videoElement = document.getElementById(videoId);
+            let currentVideoIndex = 0;
+
+            function playNextVideo() {
+                if (videoList.length > 0) {
+                    videoElement.src = videoList[currentVideoIndex];
+                    videoElement.play();
+                    currentVideoIndex = (currentVideoIndex + 1) % videoList.length;
+                }
+            }
+
+            videoElement.addEventListener('ended', playNextVideo);
+            playNextVideo(); // Start the first video
+        }
+    </script>
+</body>
+</html>
